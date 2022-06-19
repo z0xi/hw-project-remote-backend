@@ -149,8 +149,8 @@ public class CaContract implements ContractInterface {
     @Transaction
     public CaQueryResultList queryCaAll(final Context ctx) {
         ChaincodeStub stub = ctx.getStub();
-        final String startKey = "CA-1";
-        final String endKey = "CA-99";
+        final String startKey = "ca-1";
+        final String endKey = "ca-99";
         CaQueryResultList resultList = new CaQueryResultList();
         QueryResultsIterator<KeyValue> queryResult = stub.getStateByRange(startKey, endKey);
         List<CaQueryResult> results = Lists.newArrayList();
