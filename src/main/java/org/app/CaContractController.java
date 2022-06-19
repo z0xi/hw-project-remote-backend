@@ -6,14 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.hyperledger.fabric.client.*;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import org.apache.commons.codec.binary.Base64;
@@ -28,10 +22,10 @@ import java.util.Map;
 @RequestMapping("/myca")
 @Slf4j
 @AllArgsConstructor
+@CrossOrigin
 public class CaContractController {
 
     final Gateway gateway;
-
     final Contract contract;
 
     final HyperLedgerFabricProperties hyperLedgerFabricProperties;
@@ -115,7 +109,7 @@ public class CaContractController {
     }
 
     @PutMapping("/upload")
-    public Map<String, Object> uploadByName(@RequestBody String name) throws IOException {
+    public Map<String, Object> uploadByName(@RequestBody String id) throws IOException {
        Map<String, Object> result = Maps.newConcurrentMap();
 
         try {
@@ -133,11 +127,11 @@ public class CaContractController {
                 String subject = encodeFile("./server_folder/subject");
                 String university = encodeFile("./server_folder/university");
                 String hashAlgorithm = encodeFile("./server_folder/hashAlgorithm");
-                String issure = encodeFile("./server_folder/issure");
+                String issuer = encodeFile("./server_folder/issuer");
                 String signature = encodeFile("./server_folder/signature");
                 String signatureAlgorithm = encodeFile("./server_folder/signatureAlgorithm");
                 contract.newProposal("createCa")
-                        .addArguments(key, id, age, grade, subject, university, hashAlgorithm, issure, signature, signatureAlgorithm)
+                        .addArguments(key, id, age, grade, subject, university, hashAlgorithm, issuer, signature, signatureAlgorithm)
                         .build()
                         .endorse()
                         .submitAsync();
