@@ -113,29 +113,42 @@ public class CaContractController {
 
     @PutMapping("/upload")
     public Map<String, Object> uploadByName(@RequestBody String name) throws IOException {
-        Map<String, Object> result = Maps.newConcurrentMap();
-        String key = "ca-" + count;
-        String age = encodeFile("./server_folder/age");
-        String grade = encodeFile("./server_folder/grade");
-        String subject = encodeFile("./server_folder/subject");
-        String university = encodeFile("./server_folder/university");
-        String hashAlgorithm = encodeFile("./server_folder/hashAlgorithm");
-        String issure = encodeFile("./server_folder/issure");
-        String signature = encodeFile("./server_folder/signature");
-        String signatureAlgorithm = encodeFile("./server_folder/signatureAlgorithm");
+       Map<String, Object> result = Maps.newConcurrentMap();
+
         try {
-            contract.newProposal("createCa")
-                    .addArguments(key, name, age, grade, subject, university, hashAlgorithm, issure, signature, signatureAlgorithm)
-                    .build()
-                    .endorse()
-                    .submitAsync();
-        } catch (SubmitException e) {
-            System.out.println("交易提交失败！");
+            Socket s = new Socket("127.0.0.1",8899);
+            InputStream is = s.getInputStream();
+            OutputStream os = s.getOutputStream();
+
+            //读取服务器返回的消息
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String mess = br.readLine();
+            if(mess.equals("success")){
+                String key = "ca-" + count;
+                String age = encodeFile("./server_folder/age");
+                String grade = encodeFile("./server_folder/grade");
+                String subject = encodeFile("./server_folder/subject");
+                String university = encodeFile("./server_folder/university");
+                String hashAlgorithm = encodeFile("./server_folder/hashAlgorithm");
+                String issure = encodeFile("./server_folder/issure");
+                String signature = encodeFile("./server_folder/signature");
+                String signatureAlgorithm = encodeFile("./server_folder/signatureAlgorithm");
+                contract.newProposal("createCa")
+                        .addArguments(key, id, age, grade, subject, university, hashAlgorithm, issure, signature, signatureAlgorithm)
+                        .build()
+                        .endorse()
+                        .submitAsync();
+            }
+            result.put("status", "ok");
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         } catch (EndorseException e) {
-            System.out.println("交易超时！请重新提交");
+            throw new RuntimeException(e);
+        } catch (SubmitException e) {
             throw new RuntimeException(e);
         }
-        result.put("status", "ok");
         return result;
     }
 
