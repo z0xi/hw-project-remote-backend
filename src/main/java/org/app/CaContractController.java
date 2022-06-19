@@ -159,21 +159,23 @@ public class CaContractController {
         return result;
     }
 
-    @PostMapping("/verify")
+    @PutMapping("/verify")
     public Map<String, Object> verifyProperties() throws IOException {
        Map<String, Object> result = Maps.newConcurrentMap();
-        try {
-            //TODO 获取链上属性并保存为文件enc_credential_v.json
+        System.out.print("debug");
+        Socket s = new Socket("127.0.0.1",8899);
+        InputStream is = s.getInputStream();
+        OutputStream os = s.getOutputStream();
+        PrintWriter pw=null;
+        System.out.print("debug");
+        //TODO 获取链上属性并保存为文件enc_credential_v.json
 //            for (String property:properties) {
 //                byte[] readFileToByteArray = FileUtils.readFileToByteArray(new File("./server_folder/" + property));
 //                String codes = readFileToByteArray.toString();
 //                decodeFile(codes, "./verifier_folder/" + property);
 //            }
+        try {
 
-            Socket s = new Socket("127.0.0.1",8899);
-            InputStream is = s.getInputStream();
-            OutputStream os = s.getOutputStream();
-            PrintWriter pw=null;
             pw = new PrintWriter(os);
             pw.write(1);
             pw.flush();
