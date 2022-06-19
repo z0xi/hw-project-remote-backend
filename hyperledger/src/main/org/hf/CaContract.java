@@ -1,7 +1,12 @@
-package src.main.org.hf;
+package main.org.hf;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.naming.Context;
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hyperledger.fabric.contract.Context;
 import org.hyperledger.fabric.contract.ContractInterface;
 import org.hyperledger.fabric.contract.annotation.Contact;
 import org.hyperledger.fabric.contract.annotation.Contract;
@@ -138,6 +143,23 @@ public class CaContract implements ContractInterface {
         return JSON.parseObject(caState , Ca.class);
     }
 
+    @Transaction
+    public List<CaQueryResult> queryCaAll(final Context ctx) {
+
+        ChaincodeStub stub = ctx.getStub();
+
+        final String startKey = "CA-1";
+        final String endKey = "CA-99";
+        List<CaQueryResult> queryResults = new ArrayList<CaQueryResult>();
+
+        QueryResultsIterator<KeyValue> results = stub.getStateByRange(startKey, endKey);
+
+        for (KeyValue result: results) {
+            queryResults.add(new CaQueryResult().setKey(result.getKey()).setCa(JSON.parseObject(result.getStringValue() , Ca.class)));
+        }
+        return queryResults;
+    }
+
     @Override
     public void beforeTransaction(Context ctx) {
         log.info("*************************************** beforeTransaction ***************************************");
@@ -148,4 +170,5 @@ public class CaContract implements ContractInterface {
         log.info("*************************************** afterTransaction ***************************************");
         System.out.println("result --------> " + result);
     }
+
 }
