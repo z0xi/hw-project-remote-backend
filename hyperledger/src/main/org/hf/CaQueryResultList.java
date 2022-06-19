@@ -1,20 +1,14 @@
 package main.org.hf;
 
+import lombok.Data;
+import java.util.List;
 import org.hyperledger.fabric.contract.annotation.DataType;
 import org.hyperledger.fabric.contract.annotation.Property;
-
-import lombok.Data;
-import lombok.experimental.Accessors;
 
 
 @DataType
 @Data
-@Accessors(chain = true)
-public class CaQueryResult {
-
+public class CaQueryResultList {
     @Property
-    String key;
-
-    @Property
-    Ca ca;
+    List<CaQueryResult> resultList;
 }

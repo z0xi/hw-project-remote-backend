@@ -1,11 +1,13 @@
-package src.main.org.hf;
+package main.org.hf;
 
-import java.util.ArrayList;
 import java.util.List;
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
+import org.hyperledger.fabric.contract.Context;
+import org.hyperledger.fabric.shim.ledger.KeyValue;
+import org.hyperledger.fabric.shim.ledger.QueryResultsIterator;
 
-import javax.naming.Context;
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
-
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hyperledger.fabric.contract.ContractInterface;
 import org.hyperledger.fabric.contract.annotation.Contact;
@@ -16,6 +18,7 @@ import org.hyperledger.fabric.contract.annotation.License;
 import org.hyperledger.fabric.contract.annotation.Transaction;
 import org.hyperledger.fabric.shim.ChaincodeException;
 import org.hyperledger.fabric.shim.ChaincodeStub;
+import org.hyperledger.fabric.shim.ledger.*;
 
 import com.alibaba.fastjson.JSON;
 
@@ -144,20 +147,23 @@ public class CaContract implements ContractInterface {
     }
 
     @Transaction
-    public List<CaQueryResult> queryCaAll(final Context ctx) {
-
+    public CaQueryResultList queryCaAll(final Context ctx) {
         ChaincodeStub stub = ctx.getStub();
-
         final String startKey = "CA-1";
         final String endKey = "CA-99";
-        List<CaQueryResult> queryResults = new ArrayList<CaQueryResult>();
-
-        QueryResultsIterator<KeyValue> results = stub.getStateByRange(startKey, endKey);
-
-        for (KeyValue result: results) {
-            queryResults.add(new CaQueryResult().setKey(result.getKey()).setCa(JSON.parseObject(result.getStringValue() , Ca.class)));
+        CaQueryResultList resultList = new CaQueryResultList();
+        QueryResultsIterator<KeyValue> queryResult = stub.getStateByRange(startKey, endKey);
+        List<CaQueryResult> results = Lists.newArrayList();
+        if (! IterableUtils.isEmpty(queryResult)) {
+            for (KeyValue kv: queryResult) {
+                CaQueryResult Result = new CaQueryResult();
+                Result.setKey(kv.getKey());
+                Result.setCa(JSON.parseObject(kv.getStringValue() , Ca.class));
+                results.add(Result);
+            }
+            resultList.setResultList(results);
         }
-        return queryResults;
+        return resultList;
     }
 
     @Override

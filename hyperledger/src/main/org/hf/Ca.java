@@ -1,4 +1,4 @@
-package src.main.org.hf;
+package main.org.hf;
 
 import org.hyperledger.fabric.contract.annotation.DataType;
 import org.hyperledger.fabric.contract.annotation.Property;
