@@ -154,13 +154,29 @@ public class CaContractController {
 
     @PutMapping("/verify")
     public Map<String, Object> verifyProperties(@RequestBody String[] properties) throws IOException {
-        Map<String, Object> result = Maps.newConcurrentMap();
-        for (String property:properties) {
-            byte[] readFileToByteArray = FileUtils.readFileToByteArray(new File("./server_folder/" + property));
-            String codes = readFileToByteArray.toString();
-            decodeFile(codes, "./verifier_folder/" + property);
+       Map<String, Object> result = Maps.newConcurrentMap();
+
+        try {
+            Socket s = new Socket("127.0.0.1",8899);
+            InputStream is = s.getInputStream();
+            OutputStream os = s.getOutputStream();
+
+            //读取服务器返回的消息
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String mess = br.readLine();
+            if(mess.equals("success")){
+                for (String property:properties) {
+                    byte[] readFileToByteArray = FileUtils.readFileToByteArray(new File("./server_folder/" + property));
+                    String codes = readFileToByteArray.toString();
+                    decodeFile(codes, "./verifier_folder/" + property);
+                }
+            }
+            result.put("status", "ok");
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        result.put("status", "ok");
         return result;
     }
 
