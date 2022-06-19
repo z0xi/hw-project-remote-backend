@@ -162,21 +162,30 @@ public class CaContractController {
     @PutMapping("/verify")
     public Map<String, Object> verifyProperties(@RequestBody String[] properties) throws IOException {
        Map<String, Object> result = Maps.newConcurrentMap();
-
+        PrintWriter pw=null;
         try {
+            //TODO 获取链上属性并保存为文件enc_credential_v.json
+//            for (String property:properties) {
+//                byte[] readFileToByteArray = FileUtils.readFileToByteArray(new File("./server_folder/" + property));
+//                String codes = readFileToByteArray.toString();
+//                decodeFile(codes, "./verifier_folder/" + property);
+//            }
+
             Socket s = new Socket("127.0.0.1",8899);
             InputStream is = s.getInputStream();
             OutputStream os = s.getOutputStream();
+            pw = new PrintWriter(os);
+            pw.write(1);
+            pw.flush();
+            System.out.print("File is not ready");
+
 
             //读取服务器返回的消息
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String mess = br.readLine();
             if(mess.equals("success")){
-                for (String property:properties) {
-                    byte[] readFileToByteArray = FileUtils.readFileToByteArray(new File("./server_folder/" + property));
-                    String codes = readFileToByteArray.toString();
-                    decodeFile(codes, "./verifier_folder/" + property);
-                }
+                System.out.print("Success");
+                //TODO chaincode上链
             }
             result.put("status", "ok");
         } catch (UnknownHostException e) {
