@@ -159,10 +159,9 @@ public class CaContractController {
         return result;
     }
 
-    @PutMapping("/verify")
-    public Map<String, Object> verifyProperties(@RequestBody String[] properties) throws IOException {
+    @PostMapping("/verify")
+    public Map<String, Object> verifyProperties() throws IOException {
        Map<String, Object> result = Maps.newConcurrentMap();
-        PrintWriter pw=null;
         try {
             //TODO 获取链上属性并保存为文件enc_credential_v.json
 //            for (String property:properties) {
@@ -174,6 +173,7 @@ public class CaContractController {
             Socket s = new Socket("127.0.0.1",8899);
             InputStream is = s.getInputStream();
             OutputStream os = s.getOutputStream();
+            PrintWriter pw=null;
             pw = new PrintWriter(os);
             pw.write(1);
             pw.flush();
