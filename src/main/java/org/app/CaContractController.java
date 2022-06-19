@@ -108,6 +108,16 @@ public class CaContractController {
         return result;
     }
 
+    @GetMapping("/test")
+    public Map<String, Object> test() throws GatewayException {
+
+        Map<String, Object> result = Maps.newConcurrentMap();
+        System.out.print("TEST");
+        result.put("status", "ok");
+
+        return result;
+    }
+
     @PutMapping("/upload")
     public Map<String, Object> uploadByName(@RequestBody String id) throws IOException {
        Map<String, Object> result = Maps.newConcurrentMap();
