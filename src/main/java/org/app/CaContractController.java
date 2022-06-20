@@ -128,6 +128,7 @@ public class CaContractController {
 
         // 创建客户端socket
         Socket socket = new Socket();
+        System.out.print("Oracle connected");
         // 监听客户端
         socket = serverSocket.accept();
         InputStream is=null;
@@ -145,6 +146,7 @@ public class CaContractController {
                 socket.shutdownInput();
                 //TODO 这里必须弄成任意字段，别写死
                 String key = "cred-" + count;
+                count++;
                 String age = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/age");
                 String grade = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/grade");
                 String subject = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/subject");
@@ -153,11 +155,16 @@ public class CaContractController {
                 String issuer = "CA";
                 String signature = "NO";
                 String signatureAlgorithm = "RSA";
+                //TODO 这里会有bug，key不应该在这里赋值，应该在链码里赋值，因为这个sping一挂count就得重新开始然后触发错误
                 contract.newProposal("createCa")
                         .addArguments(key, id, age, grade, subject, university, hashAlgorithm, issuer, signature, signatureAlgorithm)
                         .build()
                         .endorse()
                         .submitAsync();
+                System.out.print("Upload finish");
+            }
+            else{
+                System.out.print("Upload fail");
             }
             result.put("status", "ok");
         } catch (UnknownHostException e) {
@@ -177,8 +184,10 @@ public class CaContractController {
                     isr.close();
                 if(is!=null)
                     is.close();
-                if(socket!=null)
+                if(socket!=null){
                     socket.close();
+                    serverSocket.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
