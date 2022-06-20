@@ -14,6 +14,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Map;
@@ -119,27 +120,38 @@ public class CaContractController {
     }
 
     @PutMapping("/upload")
-    public Map<String, Object> uploadByName(@RequestBody String id) throws IOException {
+    @ResponseBody
+    public Map<String, Object> uploadByName(@RequestParam("id") String id) throws IOException {
        Map<String, Object> result = Maps.newConcurrentMap();
+        // 创建服务端socket
+        ServerSocket serverSocket = new ServerSocket(8899);
 
+        // 创建客户端socket
+        Socket socket = new Socket();
+        // 监听客户端
+        socket = serverSocket.accept();
+        InputStream is=null;
+        InputStreamReader isr=null;
+        BufferedReader br=null;
         try {
-            Socket s = new Socket("127.0.0.1",8899);
-            InputStream is = s.getInputStream();
-            OutputStream os = s.getOutputStream();
-
             //读取服务器返回的消息
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            is = socket.getInputStream();
+            isr = new InputStreamReader(is);
+            br = new BufferedReader(isr);
+
             String mess = br.readLine();
+            System.out.println(mess);
             if(mess.equals("success")){
+                socket.shutdownInput();
                 String key = "ca-" + count;
-                String age = encodeFile("./server_folder/age");
-                String grade = encodeFile("./server_folder/grade");
-                String subject = encodeFile("./server_folder/subject");
-                String university = encodeFile("./server_folder/university");
-                String hashAlgorithm = encodeFile("./server_folder/hashAlgorithm");
-                String issuer = encodeFile("./server_folder/issuer");
-                String signature = encodeFile("./server_folder/signature");
-                String signatureAlgorithm = encodeFile("./server_folder/signatureAlgorithm");
+                String age = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/age");
+                String grade = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/grade");
+                String subject = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/subject");
+                String university = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/university");
+                String hashAlgorithm = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/hashAlgorithm");
+                String issuer = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/issuer");
+                String signature = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/signature");
+                String signatureAlgorithm = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/signatureAlgorithm");
                 contract.newProposal("createCa")
                         .addArguments(key, id, age, grade, subject, university, hashAlgorithm, issuer, signature, signatureAlgorithm)
                         .build()
@@ -155,12 +167,26 @@ public class CaContractController {
             throw new RuntimeException(e);
         } catch (SubmitException e) {
             throw new RuntimeException(e);
+        } finally{
+            //关闭资源
+            try {
+                if(br!=null)
+                    br.close();
+                if(isr!=null)
+                    isr.close();
+                if(is!=null)
+                    is.close();
+                if(socket!=null)
+                    socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return result;
     }
 
-    @PutMapping("/verify")
-    public Map<String, Object> verifyProperties() throws IOException {
+    @GetMapping("/verify")
+    public Map<String, Object> verifyProperties() throws GatewayException, IOException {
        Map<String, Object> result = Maps.newConcurrentMap();
         System.out.print("debug");
         Socket s = new Socket("127.0.0.1",8899);
