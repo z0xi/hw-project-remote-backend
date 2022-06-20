@@ -143,15 +143,16 @@ public class CaContractController {
             System.out.println(mess);
             if(mess.equals("success")){
                 socket.shutdownInput();
-                String key = "ca-" + count;
+                //TODO 这里必须弄成任意字段，别写死
+                String key = "cred-" + count;
                 String age = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/age");
                 String grade = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/grade");
                 String subject = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/subject");
                 String university = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/university");
-                String hashAlgorithm = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/hashAlgorithm");
-                String issuer = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/issuer");
-                String signature = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/signature");
-                String signatureAlgorithm = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/signatureAlgorithm");
+                String hashAlgorithm = "SHA256";
+                String issuer = "CA";
+                String signature = "NO";
+                String signatureAlgorithm = "RSA";
                 contract.newProposal("createCa")
                         .addArguments(key, id, age, grade, subject, university, hashAlgorithm, issuer, signature, signatureAlgorithm)
                         .build()
