@@ -145,8 +145,6 @@ public class CaContractController {
             if(mess.equals("success")){
                 socket.shutdownInput();
                 //TODO 这里必须弄成任意字段，别写死
-                String key = "cred-" + count;
-                count++;
                 String age = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/age");
                 String grade = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/grade");
                 String subject = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/subject");
@@ -156,11 +154,8 @@ public class CaContractController {
                 String signature = "NO";
                 String signatureAlgorithm = "RSA";
                 //TODO 这里会有bug，key不应该在这里赋值，应该在链码里赋值，因为这个sping一挂count就得重新开始然后触发错误
-                contract.newProposal("createCa")
-                        .addArguments(key, id, age, grade, subject, university, hashAlgorithm, issuer, signature, signatureAlgorithm)
-                        .build()
-                        .endorse()
-                        .submitAsync();
+                byte[] bytes = contract.submitTransaction("createCa", id, name,  age, grade, subject, university, hashAlgorithm, issuer, signature, signatureAlgorithm);
+                result.put("payload", StringUtils.newStringUtf8(bytes));
                 System.out.print("Upload finish");
             }
             else{
