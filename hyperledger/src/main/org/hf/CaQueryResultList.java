@@ -12,3 +12,4 @@ public class CaQueryResultList {
     @Property
     List<CaQueryResult> resultList;
 }
+

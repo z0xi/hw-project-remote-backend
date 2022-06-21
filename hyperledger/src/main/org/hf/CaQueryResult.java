@@ -18,3 +18,4 @@ public class CaQueryResult {
     @Property
     Ca ca;
 }
+
