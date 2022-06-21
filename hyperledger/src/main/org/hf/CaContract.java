@@ -1,5 +1,6 @@
 package main.org.hf;
 
+import java.util.HashMap;
 import java.util.List;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
@@ -46,72 +47,74 @@ public class CaContract implements ContractInterface {
     public void initLedger(final Context ctx) {
         ChaincodeStub stub = ctx.getStub();
         for (int i = 0; i < 10; i++ ) {
-            Ca ca = new Ca().setName("ca-" + i)
+            Ca ca = new Ca()
+                    .setName("user" + i)
                     .setAge("2"+i)
                     .setGrade("201"+i)
                     .setSubject("CS")
                     .setUniversity("JNU")
                     .setHashAlgorithm("SHA246")
-                    .setIssure("JNU")
+                    .setIssue("JNU")
                     .setSignature("ahbckjcdkn")
                     .setSignatureAlgorithm("RSA");
-            stub.putStringState(ca.getName() , JSON.toJSONString(ca));
+            String id = Integer.toString(10000 + i);
+            stub.putStringState(id , JSON.toJSONString(ca));
         }
 
     }
 
     @Transaction
-    public Ca queryCa(final Context ctx, final String key) {
+    public Ca queryCa(final Context ctx, final String id) {
 
         ChaincodeStub stub = ctx.getStub();
-        String caState = stub.getStringState(key);
+        String caState = stub.getStringState(id);
 
         if (StringUtils.isBlank(caState)) {
-            String errorMessage = String.format("Ca %s does not exist", key);
+            String errorMessage = String.format("Ca %s does not exist", id);
             System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage);
         }
         return JSON.parseObject(caState , Ca.class);
     }
 
-
     @Transaction
-    public Ca createCa(final Context ctx, final String key , String name , String age , String grade, String subject,
-            String university, String hashAlgorithm, String issure, String signature, String signatureAlgorithm) {
+    public Ca createCa(final Context ctx, final String id, String name , String age, String grade, String subject,
+            String university, String hashAlgorithm, String issue, String signature, String signatureAlgorithm) {
         ChaincodeStub stub = ctx.getStub();
-        String caState = stub.getStringState(key);
+        String caState = stub.getStringState(id);
 
         if (StringUtils.isNotBlank(caState)) {
-            String errorMessage = String.format("Ca %s already exists", key);
+            String errorMessage = String.format("Ca %s already exists", id);
             System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage);
         }
 
-        Ca ca = new Ca().setName(name)
+        Ca ca = new Ca()
+                .setName(name)
                 .setAge(age)
                 .setGrade(grade)
                 .setSubject(subject)
                 .setUniversity(university)
                 .setHashAlgorithm(hashAlgorithm)
-                .setIssure(issure)
+                .setIssue(issue)
                 .setSignature(signature)
                 .setSignatureAlgorithm(signatureAlgorithm);
         String json = JSON.toJSONString(ca);
-        stub.putStringState(key, json);
+        stub.putStringState(id, json);
 
         stub.setEvent("createCaEvent" , org.apache.commons.codec.binary.StringUtils.getBytesUtf8(json));
         return ca;
     }
 
     @Transaction
-    public Ca updateCa(final Context ctx, final String key , String name , String age , String grade, String subject,
-            String university, String hashAlgorithm, String issure, String signature, String signatureAlgorithm) {
+    public Ca updateCa(final Context ctx, final String id , String name , String age , String grade, String subject,
+            String university, String hashAlgorithm, String issue, String signature, String signatureAlgorithm) {
 
         ChaincodeStub stub = ctx.getStub();
-        String caState = stub.getStringState(key);
+        String caState = stub.getStringState(id);
 
         if (StringUtils.isBlank(caState)) {
-            String errorMessage = String.format("Ca %s does not exist", key);
+            String errorMessage = String.format("Ca %s does not exist", id);
             System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage);
         }
@@ -122,35 +125,35 @@ public class CaContract implements ContractInterface {
                 .setSubject(subject)
                 .setUniversity(university)
                 .setHashAlgorithm(hashAlgorithm)
-                .setIssure(issure)
+                .setIssue(issue)
                 .setSignature(signature)
                 .setSignatureAlgorithm(signatureAlgorithm);
 
-        stub.putStringState(key, JSON.toJSONString(ca));
+        stub.putStringState(id, JSON.toJSONString(ca));
 
         return ca;
     }
 
     @Transaction
-    public Ca deleteCa(final Context ctx, final String key) {
+    public Ca deleteCa(final Context ctx, final String id) {
 
         ChaincodeStub stub = ctx.getStub();
-        String caState = stub.getStringState(key);
+        String caState = stub.getStringState(id);
 
         if (StringUtils.isBlank(caState)) {
-            String errorMessage = String.format("Ca %s does not exist", key);
+            String errorMessage = String.format("Ca %s does not exist", id);
             System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage);
         }
-        stub.delState(key);
+        stub.delState(id);
         return JSON.parseObject(caState , Ca.class);
     }
 
     @Transaction
     public CaQueryResultList queryCaAll(final Context ctx) {
         ChaincodeStub stub = ctx.getStub();
-        final String startKey = "ca-1";
-        final String endKey = "ca-99";
+        final String startKey = "10001";
+        final String endKey = "19999";
         CaQueryResultList resultList = new CaQueryResultList();
         QueryResultsIterator<KeyValue> queryResult = stub.getStateByRange(startKey, endKey);
         List<CaQueryResult> results = Lists.newArrayList();
