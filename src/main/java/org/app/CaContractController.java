@@ -58,7 +58,7 @@ public class CaContractController {
     }
 
     @PutMapping("/async")
-    public Map<String, Object> createCatAsync(@RequestBody CaDTO ca) throws Exception {
+    public Map<String, Object> createCaAsync(@RequestBody CaDTO ca) throws Exception {
         Map<String, Object> result = Maps.newConcurrentMap();
 
         contract.newProposal("createCa")
@@ -121,7 +121,7 @@ public class CaContractController {
 
     @PutMapping("/upload")
     @ResponseBody
-    public Map<String, Object> uploadByName(@RequestParam("id") String id) throws IOException {
+    public Map<String, Object> uploadByName(@RequestBody String id) throws IOException {
        Map<String, Object> result = Maps.newConcurrentMap();
         // 创建服务端socket
         ServerSocket serverSocket = new ServerSocket(8899);
