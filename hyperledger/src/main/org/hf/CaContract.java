@@ -41,6 +41,7 @@ import lombok.extern.java.Log;
 @Default
 @Log
 public class CaContract implements ContractInterface {
+    public static int count = 10000;
 
     @Transaction
     public void initLedger(final Context ctx) {
@@ -51,18 +52,13 @@ public class CaContract implements ContractInterface {
                     .setGrade("201"+i)
                     .setSubject("CS")
                     .setUniversity("JNU")
-                    .setHashAlgorithm("SHA246")
-                    .setIssure("JNU")
-                    .setSignature("ahbckjcdkn")
-                    .setSignatureAlgorithm("RSA");
-            stub.putStringState(ca.getName() , JSON.toJSONString(ca));
+                    .setIssue("JNU");
+            stub.putStringState(Integer.toString(count++) , JSON.toJSONString(ca));
         }
-
     }
 
     @Transaction
     public Ca queryCa(final Context ctx, final String key) {
-
         ChaincodeStub stub = ctx.getStub();
         String caState = stub.getStringState(key);
 
@@ -74,10 +70,9 @@ public class CaContract implements ContractInterface {
         return JSON.parseObject(caState , Ca.class);
     }
 
-
     @Transaction
-    public Ca createCa(final Context ctx, final String key , String name , String age , String grade, String subject,
-            String university, String hashAlgorithm, String issure, String signature, String signatureAlgorithm) {
+    public String createCa(final Context ctx, String name , String age , String grade, String subject, String university, String issue) {
+        String key = Integer.toString(count++);
         ChaincodeStub stub = ctx.getStub();
         String caState = stub.getStringState(key);
 
@@ -92,20 +87,16 @@ public class CaContract implements ContractInterface {
                 .setGrade(grade)
                 .setSubject(subject)
                 .setUniversity(university)
-                .setHashAlgorithm(hashAlgorithm)
-                .setIssure(issure)
-                .setSignature(signature)
-                .setSignatureAlgorithm(signatureAlgorithm);
+                .setIssue(issue);
         String json = JSON.toJSONString(ca);
         stub.putStringState(key, json);
 
         stub.setEvent("createCaEvent" , org.apache.commons.codec.binary.StringUtils.getBytesUtf8(json));
-        return ca;
+        return key;
     }
 
     @Transaction
-    public Ca updateCa(final Context ctx, final String key , String name , String age , String grade, String subject,
-            String university, String hashAlgorithm, String issure, String signature, String signatureAlgorithm) {
+    public Ca updateCa(final Context ctx, final String key , String name , String age , String grade, String subject, String university, String issue) {
 
         ChaincodeStub stub = ctx.getStub();
         String caState = stub.getStringState(key);
@@ -115,17 +106,12 @@ public class CaContract implements ContractInterface {
             System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage);
         }
-
         Ca ca = new Ca().setName(name)
                 .setAge(age)
                 .setGrade(grade)
                 .setSubject(subject)
                 .setUniversity(university)
-                .setHashAlgorithm(hashAlgorithm)
-                .setIssure(issure)
-                .setSignature(signature)
-                .setSignatureAlgorithm(signatureAlgorithm);
-
+                .setIssue(issue);
         stub.putStringState(key, JSON.toJSONString(ca));
 
         return ca;
@@ -133,7 +119,6 @@ public class CaContract implements ContractInterface {
 
     @Transaction
     public Ca deleteCa(final Context ctx, final String key) {
-
         ChaincodeStub stub = ctx.getStub();
         String caState = stub.getStringState(key);
 
@@ -149,8 +134,8 @@ public class CaContract implements ContractInterface {
     @Transaction
     public CaQueryResultList queryCaAll(final Context ctx) {
         ChaincodeStub stub = ctx.getStub();
-        final String startKey = "10001";
-        final String endKey = "19999";
+        final String startKey = "10000";
+        final String endKey = "99999";
         CaQueryResultList resultList = new CaQueryResultList();
         QueryResultsIterator<KeyValue> queryResult = stub.getStateByRange(startKey, endKey);
         List<CaQueryResult> results = Lists.newArrayList();
@@ -178,4 +163,3 @@ public class CaContract implements ContractInterface {
     }
 
 }
-
