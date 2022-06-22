@@ -10,7 +10,6 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class Ca {
-
     @Property
     String name;
 
@@ -27,15 +26,5 @@ public class Ca {
     String university;
 
     @Property()
-    String hashAlgorithm;
-
-    @Property()
-    String issure;
-
-    @Property()
-    String signature;
-
-    @Property()
-    String signatureAlgorithm;
+    String issue;
 }
-
