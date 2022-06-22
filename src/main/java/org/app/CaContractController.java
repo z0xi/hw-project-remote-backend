@@ -146,6 +146,7 @@ public class CaContractController {
                 socket.shutdownInput();
                 //TODO 这里必须弄成任意字段，别写死
                 String age = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/age");
+                String name = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/name");
                 String grade = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/grade");
                 String subject = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/subject");
                 String university = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/university");
@@ -169,6 +170,10 @@ public class CaContractController {
         } catch (EndorseException e) {
             throw new RuntimeException(e);
         } catch (SubmitException e) {
+            throw new RuntimeException(e);
+        } catch (CommitException e) {
+            throw new RuntimeException(e);
+        } catch (CommitStatusException e) {
             throw new RuntimeException(e);
         } finally{
             //关闭资源
