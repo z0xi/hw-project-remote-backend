@@ -1,7 +1,6 @@
 package org.app;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +50,7 @@ public class CaContractController {
 
         Map<String, Object> result = Maps.newConcurrentMap();
 
-        byte[] bytes = contract.submitTransaction("createCa", ca.getKey(), ca.getName(), ca.getAge(), ca.getGrade(), ca.getSubject(), ca.getUniversity(), ca.getHashAlgorithm(), ca.getIssure(), ca.getSignature(), ca.getSignatureAlgorithm());
+        byte[] bytes = contract.submitTransaction("createCa", ca.getName(), ca.getAge(), ca.getGrade(), ca.getSubject(), ca.getUniversity(), ca.getIssue());
 
         result.put("payload", StringUtils.newStringUtf8(bytes));
         result.put("status", "ok");
@@ -63,7 +62,7 @@ public class CaContractController {
         Map<String, Object> result = Maps.newConcurrentMap();
 
         contract.newProposal("createCa")
-                .addArguments(ca.getKey(), ca.getName(), ca.getAge(), ca.getGrade(), ca.getSubject(), ca.getUniversity(), ca.getHashAlgorithm(), ca.getIssure(), ca.getSignature(), ca.getSignatureAlgorithm())
+                .addArguments(ca.getName(), ca.getAge(), ca.getGrade(), ca.getSubject(), ca.getUniversity(), ca.getIssue())
                 .build()
                 .endorse()
                 .submitAsync();
@@ -77,7 +76,7 @@ public class CaContractController {
     public Map<String, Object> updateCa(@RequestBody CaDTO ca) throws Exception {
 
         Map<String, Object> result = Maps.newConcurrentMap();
-        byte[] bytes = contract.submitTransaction("updateCa", ca.getKey(), ca.getName(), ca.getAge(), ca.getGrade(), ca.getSubject(), ca.getUniversity(), ca.getHashAlgorithm(), ca.getIssure(), ca.getSignature(), ca.getSignatureAlgorithm());
+        byte[] bytes = contract.submitTransaction("updateCa", ca.getId(), ca.getName(), ca.getAge(), ca.getGrade(), ca.getSubject(), ca.getUniversity(), ca.getIssue());
 
         result.put("payload", StringUtils.newStringUtf8(bytes));
         result.put("status", "ok");
@@ -99,14 +98,12 @@ public class CaContractController {
     }
 
     @GetMapping("/queryAll")
-    @ResponseBody
-    public Map<Object,Object> queryAll() throws GatewayException {
+    public Map<String, Object> queryAll() throws GatewayException {
 
-        Map<Object, Object> result = Maps.newConcurrentMap();
+        Map<String, Object> result = Maps.newConcurrentMap();
         byte[] ca = contract.evaluateTransaction("queryCaAll");
-        String str = StringUtils.newStringUtf8(ca);
-        JSONObject obj = JSON.parseObject(str);
-        result.put("payload", obj);
+
+        result.put("payload", StringUtils.newStringUtf8(ca));
         result.put("status", "ok");
 
         return result;
@@ -122,9 +119,8 @@ public class CaContractController {
         return result;
     }
 
-    @PutMapping("/upload")
-    @ResponseBody
-    public Map<String, Object> uploadByName(@RequestParam("id") String id) throws IOException {
+    @GetMapping("/upload")
+    public Map<String, Object> uploadByName() throws IOException {
        Map<String, Object> result = Maps.newConcurrentMap();
         // 创建服务端socket
         ServerSocket serverSocket = new ServerSocket(8899);
@@ -153,12 +149,9 @@ public class CaContractController {
                 String grade = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/grade");
                 String subject = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/subject");
                 String university = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/university");
-                String hashAlgorithm = "SHA256";
                 String issuer = "CA";
-                String signature = "NO";
-                String signatureAlgorithm = "RSA";
                 //TODO 这里会有bug，key不应该在这里赋值，应该在链码里赋值，因为这个sping一挂count就得重新开始然后触发错误
-                byte[] bytes = contract.submitTransaction("createCa", id, name,  age, grade, subject, university, hashAlgorithm, issuer, signature, signatureAlgorithm);
+                byte[] bytes = contract.submitTransaction("createCa", name, age, grade, subject, university, issuer);
                 result.put("payload", StringUtils.newStringUtf8(bytes));
                 System.out.print("Upload finish");
             }
