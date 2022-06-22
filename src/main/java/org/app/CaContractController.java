@@ -1,6 +1,7 @@
 package org.app;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -98,12 +99,14 @@ public class CaContractController {
     }
 
     @GetMapping("/queryAll")
-    public Map<String, Object> queryAll() throws GatewayException {
+    @ResponseBody
+    public Map<Object,Object> queryAll() throws GatewayException {
 
-        Map<String, Object> result = Maps.newConcurrentMap();
+        Map<Object, Object> result = Maps.newConcurrentMap();
         byte[] ca = contract.evaluateTransaction("queryCaAll");
-
-        result.put("payload", StringUtils.newStringUtf8(ca));
+        String str = StringUtils.newStringUtf8(ca);
+        JSONObject obj = JSON.parseObject(str);
+        result.put("payload", obj);
         result.put("status", "ok");
 
         return result;
