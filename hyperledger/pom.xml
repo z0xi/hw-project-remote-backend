@@ -130,7 +130,7 @@
 
 
     <build>
-        <sourceDirectory>src/main/org/hf</sourceDirectory>
+        <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
