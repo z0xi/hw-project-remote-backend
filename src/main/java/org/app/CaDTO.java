@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class CaDTO {
-    String key;
+    String id;
 
     String name;
 
@@ -19,11 +19,5 @@ public class CaDTO {
 
     String university;
 
-    String hashAlgorithm;
-
-    String issure;
-
-    String signature;
-
-    String signatureAlgorithm;
+    String issue;
 }
