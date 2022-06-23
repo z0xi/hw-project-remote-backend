@@ -117,7 +117,7 @@ public class CaContractController {
     public Map<Object,Object> queryServiceList() throws GatewayException {
 
         Map<Object, Object> result = Maps.newConcurrentMap();
-        //TODO 获取链上服务列表 服务ID 服务名字 服务所需属性
+        //TODO 获取链上服务列表 服务ID 服务名字 服务所需属性组合
 //        byte[] ca = contract.evaluateTransaction("queryCaAll");
 //        String str = StringUtils.newStringUtf8(ca);
 //        JSONObject obj = JSON.parseObject(str);
@@ -145,7 +145,7 @@ public class CaContractController {
 
         // 创建客户端socket
         Socket socket = new Socket();
-        System.out.print("Oracle connected");
+        System.out.print("Oracle connected\n");
         // 监听客户端
         socket = serverSocket.accept();
         InputStream is=null;
@@ -168,13 +168,12 @@ public class CaContractController {
                 String subject = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/subject");
                 String university = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/university");
                 String issuer = "CA";
-                //TODO 这里会有bug，key不应该在这里赋值，应该在链码里赋值，因为这个sping一挂count就得重新开始然后触发错误
                 byte[] bytes = contract.submitTransaction("createCa", name, age, grade, subject, university, issuer);
                 result.put("payload", StringUtils.newStringUtf8(bytes));
-                System.out.print("Upload finish");
+                System.out.print("Upload finish\n");
             }
             else{
-                System.out.print("Upload fail");
+                System.out.print("Upload fail\n");
             }
             result.put("status", "ok");
         } catch (UnknownHostException e) {
@@ -210,21 +209,22 @@ public class CaContractController {
     }
 
     @GetMapping("/verify")
+    @ResponseBody
     public Map<String, Object> verifyProperties() throws GatewayException, IOException {
         Map<String, Object> result = Maps.newConcurrentMap();
         ServerSocket serverSocket = new ServerSocket(8888);
         // 创建客户端socket
         Socket socket = new Socket();
-        System.out.print("User connected");
         // 监听客户端
         socket = serverSocket.accept();
+        System.out.print("User connected\n");
         InputStream is=null;
         InputStreamReader isr=null;
         BufferedReader br=null;
         OutputStream os = null;
-        PrintWriter pw=null;
-        System.out.print("Fetch on-chain attributes");
-        //TODO 获取链上属性并保存为文件enc_credential_v.json
+        PrintWriter pw = null;
+        System.out.print("Fetch on-chain attributes\n");
+        //TODO 获取链上属性并保存为文件 enc_credential_v.json 存放到文件夹
 //            for (String property:properties) {
 //                byte[] readFileToByteArray = FileUtils.readFileToByteArray(new File("./server_folder/" + property));
 //                String codes = readFileToByteArray.toString();
@@ -232,10 +232,11 @@ public class CaContractController {
 //            }
         try {
             //发送消息给verifier说明enc_credential_v.json已经准备就绪
+            os = socket.getOutputStream();
             pw = new PrintWriter(os);
             pw.write(1);
             pw.flush();
-            System.out.print("Verifying");
+            System.out.print("Verifying…\n");
 
             //读取服务器返回的消息
             is = socket.getInputStream();
@@ -244,7 +245,7 @@ public class CaContractController {
             String mess = br.readLine();
             System.out.println(mess);
             if(mess.equals("success")){
-                System.out.print("Success");
+                System.out.print("Success\n");
                 //TODO chaincode上链
             }
             result.put("status", "ok");
@@ -259,6 +260,10 @@ public class CaContractController {
                     br.close();
                 if(isr!=null)
                     isr.close();
+                if(os!=null)
+                    os.close();
+                if(pw!=null)
+                    pw.close();
                 if(is!=null)
                     is.close();
                 if(socket!=null){
