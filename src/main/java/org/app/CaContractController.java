@@ -112,6 +112,21 @@ public class CaContractController {
         return result;
     }
 
+    @GetMapping("/queryServiceList")
+    @ResponseBody
+    public Map<Object,Object> queryServiceList() throws GatewayException {
+
+        Map<Object, Object> result = Maps.newConcurrentMap();
+        //TODO 获取链上服务列表 服务ID 服务名字 服务所需属性
+//        byte[] ca = contract.evaluateTransaction("queryCaAll");
+//        String str = StringUtils.newStringUtf8(ca);
+//        JSONObject obj = JSON.parseObject(str);
+//        result.put("payload", obj);
+//        result.put("status", "ok");
+
+        return result;
+    }
+
     @GetMapping("/test")
     public Map<String, Object> test() throws GatewayException {
 
@@ -196,13 +211,19 @@ public class CaContractController {
 
     @GetMapping("/verify")
     public Map<String, Object> verifyProperties() throws GatewayException, IOException {
-       Map<String, Object> result = Maps.newConcurrentMap();
-        System.out.print("debug");
-        Socket s = new Socket("127.0.0.1",8899);
-        InputStream is = s.getInputStream();
-        OutputStream os = s.getOutputStream();
+        Map<String, Object> result = Maps.newConcurrentMap();
+        ServerSocket serverSocket = new ServerSocket(8888);
+        // 创建客户端socket
+        Socket socket = new Socket();
+        System.out.print("User connected");
+        // 监听客户端
+        socket = serverSocket.accept();
+        InputStream is=null;
+        InputStreamReader isr=null;
+        BufferedReader br=null;
+        OutputStream os = null;
         PrintWriter pw=null;
-        System.out.print("debug");
+        System.out.print("Fetch on-chain attributes");
         //TODO 获取链上属性并保存为文件enc_credential_v.json
 //            for (String property:properties) {
 //                byte[] readFileToByteArray = FileUtils.readFileToByteArray(new File("./server_folder/" + property));
@@ -210,16 +231,18 @@ public class CaContractController {
 //                decodeFile(codes, "./verifier_folder/" + property);
 //            }
         try {
-
+            //发送消息给verifier说明enc_credential_v.json已经准备就绪
             pw = new PrintWriter(os);
             pw.write(1);
             pw.flush();
-            System.out.print("File is not ready");
-
+            System.out.print("Verifying");
 
             //读取服务器返回的消息
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            is = socket.getInputStream();
+            isr = new InputStreamReader(is);
+            br = new BufferedReader(isr);
             String mess = br.readLine();
+            System.out.println(mess);
             if(mess.equals("success")){
                 System.out.print("Success");
                 //TODO chaincode上链
@@ -229,6 +252,22 @@ public class CaContractController {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally{
+            //关闭资源
+            try {
+                if(br!=null)
+                    br.close();
+                if(isr!=null)
+                    isr.close();
+                if(is!=null)
+                    is.close();
+                if(socket!=null){
+                    socket.close();
+                    serverSocket.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return result;
     }
