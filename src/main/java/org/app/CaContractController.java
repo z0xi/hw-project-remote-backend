@@ -234,7 +234,7 @@ public class CaContractController {
             //发送消息给verifier说明enc_credential_v.json已经准备就绪
             os = socket.getOutputStream();
             pw = new PrintWriter(os);
-            pw.write(1);
+            pw.write("FileReady");
             pw.flush();
             System.out.print("Verifying…\n");
 
