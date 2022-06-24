@@ -121,7 +121,10 @@ public class CaContractController {
         Network network = gateway.getNetwork("mychannel");
         Contract verifyContract = network.getContract("verify");
         byte[] ca = verifyContract.evaluateTransaction("queryVerifyAll");
-        result.put("payload", StringUtils.newStringUtf8(ca));
+        String str = StringUtils.newStringUtf8(ca);
+        JSONObject obj = JSON.parseObject(str);
+
+        result.put("payload", obj);
         result.put("status", "ok");
 
         return result;
