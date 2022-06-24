@@ -118,11 +118,11 @@ public class CaContractController {
 
         Map<Object, Object> result = Maps.newConcurrentMap();
         //TODO 获取链上服务列表 服务ID 服务名字 服务所需属性组合
-//        byte[] ca = contract.evaluateTransaction("queryCaAll");
-//        String str = StringUtils.newStringUtf8(ca);
-//        JSONObject obj = JSON.parseObject(str);
-//        result.put("payload", obj);
-//        result.put("status", "ok");
+        Network network = gateway.getNetwork("mychannel");
+        Contract verifyContract = network.getContract("verify");
+        byte[] ca = verifyContract.evaluateTransaction("queryVerifyAll");
+        result.put("payload", StringUtils.newStringUtf8(ca));
+        result.put("status", "ok");
 
         return result;
     }
@@ -225,8 +225,8 @@ public class CaContractController {
         PrintWriter pw = null;
         System.out.print("Fetch on-chain attributes\n");
         //TODO 获取链上属性并保存为文件 enc_credential_v.json 存放到文件夹
-         byte[] ca = contract.evaluateTransaction("queryCa", id);
-            byteToFile(ca, "enc_credential_v.json");
+        byte[] ca = contract.evaluateTransaction("queryCa", id);
+        byteToFile(ca, "enc_credential_v.json");
 //            for (String property:properties) {
 //                byte[] readFileToByteArray = FileUtils.readFileToByteArray(new File("./server_folder/" + property));
 //                String codes = readFileToByteArray.toString();
@@ -248,11 +248,22 @@ public class CaContractController {
             System.out.println(mess);
             if(mess.equals("success")){
                 System.out.print("Success\n");
-                byte[] bytes = contract.submitTransaction("createVerify", id,  id, "sever1", "help", "authorized", "{age=123,name=tom}");
                 //TODO chaincode上链
+                Network network = gateway.getNetwork("mychannel");
+                Contract verifyContract = network.getContract("verify");
+                byte[] bytes = verifyContract.submitTransaction("createVerify", id,  id, "sever1", "help", "authorized", "{name=123}");
             }
+            result.put("payload", StringUtils.newStringUtf8(bytes));
             result.put("status", "ok");
-        } catch (UnknownHostException e) {
+        } catch (GatewayException e) {
+            String errorMessage = String.format("Ca: %s does not exist", id);
+            System.out.println(errorMessage);
+            throw new RuntimeException(errorMessage);
+        }catch (CommitException e) {
+            String errorMessage = String.format("Verify: %s already exists", id);
+            System.out.println(errorMessage);
+            throw new RuntimeException(errorMessage);
+        }catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
