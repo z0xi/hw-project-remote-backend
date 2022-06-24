@@ -208,9 +208,9 @@ public class CaContractController {
         return result;
     }
 
-    @GetMapping("/verify")
+    @PutMapping("/verify")
     @ResponseBody
-    public Map<String, Object> verifyProperties() throws GatewayException, IOException {
+    public Map<String, Object> verifyProperties(@RequestBody String id) throws GatewayException, IOException {
         Map<String, Object> result = Maps.newConcurrentMap();
         ServerSocket serverSocket = new ServerSocket(8888);
         // 创建客户端socket
@@ -225,6 +225,8 @@ public class CaContractController {
         PrintWriter pw = null;
         System.out.print("Fetch on-chain attributes\n");
         //TODO 获取链上属性并保存为文件 enc_credential_v.json 存放到文件夹
+         byte[] ca = contract.evaluateTransaction("queryCa", id);
+            byteToFile(ca, "enc_credential_v.json");
 //            for (String property:properties) {
 //                byte[] readFileToByteArray = FileUtils.readFileToByteArray(new File("./server_folder/" + property));
 //                String codes = readFileToByteArray.toString();
@@ -237,7 +239,7 @@ public class CaContractController {
             pw.write("FileReady");
             pw.flush();
             System.out.print("Verifying…\n");
-
+           
             //读取服务器返回的消息
             is = socket.getInputStream();
             isr = new InputStreamReader(is);
@@ -246,6 +248,7 @@ public class CaContractController {
             System.out.println(mess);
             if(mess.equals("success")){
                 System.out.print("Success\n");
+                byte[] bytes = contract.submitTransaction("createVerify", id,  id, "sever1", "help", "authorized", "{age=123,name=tom}");
                 //TODO chaincode上链
             }
             result.put("status", "ok");
@@ -294,6 +297,13 @@ public class CaContractController {
 
     public static void decodeFile(String codes, String filePath) throws IOException {
         decodeFile(codes, new File(filePath));
+    }
+    
+    public static void byteToFile(byte[] bytes, String fileName) throws IOException {
+        File file = new File(fileName);
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+        bos.write(bytes);
+        bos.close();
     }
 
 }
