@@ -85,14 +85,14 @@ public class CaContractController {
         return result;
     }
 
-    @DeleteMapping("/{key}")
+    @DeleteMapping("/deleteCert/{key}")
     public Map<String, Object> deleteCaByKey(@PathVariable String key) throws Exception {
 
         Map<String, Object> result = Maps.newConcurrentMap();
 
-        byte[] ca = contract.submitTransaction("deleteCa" , key);
+//        byte[] ca = contract.submitTransaction("deleteCa" , key);
 
-        result.put("payload", StringUtils.newStringUtf8(ca));
+//        result.put("payload", StringUtils.newStringUtf8(ca));
         result.put("status", "ok");
 
         return result;
@@ -246,12 +246,13 @@ public class CaContractController {
             br = new BufferedReader(isr);
             String mess = br.readLine();
             System.out.println(mess);
+            byte[] bytes = null;
             if(mess.equals("success")){
                 System.out.print("Success\n");
                 //TODO chaincode上链
                 Network network = gateway.getNetwork("mychannel");
                 Contract verifyContract = network.getContract("verify");
-                byte[] bytes = verifyContract.submitTransaction("createVerify", id,  id, "sever1", "help", "authorized", "{name=123}");
+                bytes = verifyContract.submitTransaction("createVerify", id,  id, "sever1", "help", "authorized", "{name=123}");
             }
             result.put("payload", StringUtils.newStringUtf8(bytes));
             result.put("status", "ok");
