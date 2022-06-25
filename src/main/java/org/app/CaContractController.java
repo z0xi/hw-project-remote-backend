@@ -213,7 +213,7 @@ public class CaContractController {
 
     @PutMapping("/verify")
     @ResponseBody
-    public Map<String, Object> verifyProperties(@RequestBody String id) throws GatewayException, IOException {
+    public Map<String, Object> verifyProperties(@RequestBody String key, @RequestBody String id) throws GatewayException, IOException {
         Map<String, Object> result = Maps.newConcurrentMap();
         ServerSocket serverSocket = new ServerSocket(8888);
         // 创建客户端socket
@@ -255,7 +255,7 @@ public class CaContractController {
                 //TODO chaincode上链
                 Network network = gateway.getNetwork("mychannel");
                 Contract verifyContract = network.getContract("verify");
-                bytes = verifyContract.submitTransaction("createVerify", id,  id, "sever1", "help", "authorized", "{name=123}");
+                bytes = verifyContract.submitTransaction("updateVerify", key,  id, "sever1", "help", "authorized", "{name=123}");
             }
             result.put("payload", StringUtils.newStringUtf8(bytes));
             result.put("status", "ok");
