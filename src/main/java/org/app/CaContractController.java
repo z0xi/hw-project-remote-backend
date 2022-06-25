@@ -204,13 +204,13 @@ public class CaContractController {
         return result;
     }
 
-    @PutMapping("/verify")
+    @PostMapping("/verify")
     @ResponseBody
     public Map<String, Object> verifyProperties(@RequestParam("key") String key, @RequestParam("certid") String id, @RequestParam("paramset") String[] properties) throws GatewayException, IOException {
         Map<String, Object> result = Maps.newConcurrentMap();
         //此字符数组应为参数传入属性名集合，这里提前定义作为测试使用
 //        String properties[] = new String[]{"name", "age", "grade"};//attrs
-        
+        System.out.print("12345");
         ServerSocket serverSocket = new ServerSocket(8888);
         // 创建客户端socket
         Socket socket = new Socket();
