@@ -152,14 +152,10 @@ public class CaContractController {
         System.out.print("Oracle connected\n");
         // 监听客户端
         socket = serverSocket.accept();
-        InputStream is=null;
-        InputStreamReader isr=null;
         BufferedReader br=null;
         try {
             //读取服务器返回的消息
-            is = socket.getInputStream();
-            isr = new InputStreamReader(is);
-            br = new BufferedReader(isr);
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             String mess = br.readLine();
             System.out.println(mess);
@@ -197,10 +193,6 @@ public class CaContractController {
             try {
                 if(br!=null)
                     br.close();
-                if(isr!=null)
-                    isr.close();
-                if(is!=null)
-                    is.close();
                 if(socket!=null){
                     socket.close();
                     serverSocket.close();
@@ -225,10 +217,7 @@ public class CaContractController {
         // 监听客户端
         socket = serverSocket.accept();
         System.out.print("User connected\n");
-        InputStream is=null;
-        InputStreamReader isr=null;
         BufferedReader br=null;
-        OutputStream os = null;
         PrintWriter pw = null;
         System.out.print("Fetch on-chain attributes\n");
         //TODO 获取链上属性并保存为文件 enc_credential_v.json 存放到文件夹
@@ -251,16 +240,13 @@ public class CaContractController {
 
         try {
             //发送消息给verifier说明enc_credential_v.json已经准备就绪
-            os = socket.getOutputStream();
-            pw = new PrintWriter(os);
+            pw = new PrintWriter(socket.getOutputStream());
             pw.write("FileReady");
             pw.flush();
             System.out.print("Verifying…\n");
            
             //读取服务器返回的消息
-            is = socket.getInputStream();
-            isr = new InputStreamReader(is);
-            br = new BufferedReader(isr);
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String mess = br.readLine();
             System.out.println(mess);
             byte[] bytes = null;
@@ -290,14 +276,8 @@ public class CaContractController {
             try {
                 if(br!=null)
                     br.close();
-                if(isr!=null)
-                    isr.close();
-                if(os!=null)
-                    os.close();
                 if(pw!=null)
                     pw.close();
-                if(is!=null)
-                    is.close();
                 if(socket!=null){
                     socket.close();
                     serverSocket.close();
