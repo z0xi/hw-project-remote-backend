@@ -18,6 +18,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -213,10 +214,10 @@ public class CaContractController {
 
     @PutMapping("/verify")
     @ResponseBody
-    public Map<String, Object> verifyProperties(@RequestBody String key, @RequestBody String id) throws GatewayException, IOException {
+    public Map<String, Object> verifyProperties(@RequestParam("key") String key, @RequestParam("usedid") String id, @RequestParam("paramset") String[] properties) throws GatewayException, IOException {
         Map<String, Object> result = Maps.newConcurrentMap();
         //此字符数组应为参数传入属性名集合，这里提前定义作为测试使用
-        String properties[] = new String[]{"name", "age", "grade"};//attrs
+//        String properties[] = new String[]{"name", "age", "grade"};//attrs
         
         ServerSocket serverSocket = new ServerSocket(8888);
         // 创建客户端socket
@@ -238,7 +239,7 @@ public class CaContractController {
         for (int i = 3; i < str.length; i+=4) {
             map.put(str[i-2], str[i]);
         }
-        OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("enc_credential_v.json"),"UTF-8");
+        OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("/home/kali/Desktop/hw-project/verifier/verifier_folder/enc_credential_v.json"),"UTF-8");
         JSONObject obj = new JSONObject();
         for (String s: properties) {
             System.out.println("key="+s+","+"value="+map.get(s));//输出方便查看
