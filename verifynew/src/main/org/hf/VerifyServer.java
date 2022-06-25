@@ -8,10 +8,20 @@ import org.hyperledger.fabric.contract.annotation.Property;
 @DataType
 @Data
 @Accessors(chain = true)
-public class VerifyQueryResult {
+public class VerifyServer {
     @Property
-    String key;
+    String userid;
 
     @Property
-    VerifyServer verify;
+    String serverid;
+
+    @Property()
+    String sever;
+
+    @Property()
+    String state;
+
+    @Property()
+    String properties;
+
 }

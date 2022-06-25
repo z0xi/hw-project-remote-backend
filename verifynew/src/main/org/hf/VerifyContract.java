@@ -1,7 +1,5 @@
 package main.org.hf;
 
-import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.List;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
@@ -20,7 +18,6 @@ import org.hyperledger.fabric.contract.annotation.License;
 import org.hyperledger.fabric.contract.annotation.Transaction;
 import org.hyperledger.fabric.shim.ChaincodeException;
 import org.hyperledger.fabric.shim.ChaincodeStub;
-import org.hyperledger.fabric.shim.ledger.*;
 
 import lombok.extern.java.Log;
 
@@ -42,51 +39,50 @@ import lombok.extern.java.Log;
 @Log
 public class VerifyContract implements ContractInterface {
 
+    public static int count = 10000;
+
     @Transaction
     public void initLedger(final Context ctx) {
         ChaincodeStub stub = ctx.getStub();
         for (int i = 0; i < 10; i++ ) {
-            VerifySever verify = new VerifySever()
+            VerifyServer verify = new VerifyServer()
                     .setUserid("user" + i)
-                    .setSeverid("201"+i)
+                    .setServerid("201"+i)
                     .setSever("CS")
                     .setState("JNU")
                     .setProperties( "{age=12,name=tom}");
-            String id = Integer.toString(10000 + i);
-            stub.putStringState(id , JSON.toJSONString(verify));
+            stub.putStringState(Integer.toString(count++) , JSON.toJSONString(verify));
         }
 
     }
 
     @Transaction
-    public VerifySever createVerify(final Context ctx, final String id, String userid , String severid, String sever,
-                                    String state, String properties) {
+    public VerifyServer createVerify(final Context ctx, String userid, String serverid, String sever, String state, String properties) {
+        String key = Integer.toString(count++);
         ChaincodeStub stub = ctx.getStub();
-        String caState = stub.getStringState(id);
+        String caState = stub.getStringState(key);
 
         if (StringUtils.isNotBlank(caState)) {
-            String errorMessage = String.format("VerifySever %s already exists", id);
+            String errorMessage = String.format("VerifySever %s already exists", key);
             System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage);
         }
 
-        VerifySever verify = new VerifySever()
+        VerifyServer verify = new VerifyServer()
                 .setUserid(userid)
-                .setSeverid(severid)
+                .setServerid(serverid)
                 .setSever(sever)
                 .setState(state)
                 .setProperties(properties);
         String json = JSON.toJSONString(verify);
-        stub.putStringState(id, json);
+        stub.putStringState(key, json);
 
         stub.setEvent("createVerifySeverEvent" , org.apache.commons.codec.binary.StringUtils.getBytesUtf8(json));
         return verify;
     }
- 
-
 
     @Transaction
-    public VerifySever queryVerify(final Context ctx, final String id) {
+    public VerifyServer queryVerify(final Context ctx, final String id) {
 
         ChaincodeStub stub = ctx.getStub();
         String verifyState = stub.getStringState(id);
@@ -96,11 +92,11 @@ public class VerifyContract implements ContractInterface {
             System.out.println(errorMessage);
             throw new ChaincodeException(errorMessage);
         }
-        return JSON.parseObject(verifyState, VerifySever.class);
+        return JSON.parseObject(verifyState, VerifyServer.class);
     }
 
     @Transaction
-    public VerifySever deleteVerify(final Context ctx, final String id) {
+    public VerifyServer deleteVerify(final Context ctx, final String id) {
 
         ChaincodeStub stub = ctx.getStub();
         String verifyState = stub.getStringState(id);
@@ -111,7 +107,32 @@ public class VerifyContract implements ContractInterface {
             throw new ChaincodeException(errorMessage);
         }
         stub.delState(id);
-        return JSON.parseObject(verifyState , VerifySever.class);
+        return JSON.parseObject(verifyState , VerifyServer.class);
+    }
+
+    @Transaction
+    public VerifyServer updateVerify(final Context ctx, final String key , String userid , String serverid, String sever,
+                                     String state, String properties) {
+
+        ChaincodeStub stub = ctx.getStub();
+        String caState = stub.getStringState(key);
+
+        if (StringUtils.isBlank(caState)) {
+            String errorMessage = String.format("VerifySever %s does not exist", key);
+            System.out.println(errorMessage);
+            throw new ChaincodeException(errorMessage);
+        }
+
+        VerifyServer verify = new VerifyServer()
+                .setUserid(userid)
+                .setServerid(serverid)
+                .setSever(sever)
+                .setState(state)
+                .setProperties(properties);
+        String json = JSON.toJSONString(verify);
+        stub.putStringState(key, JSON.toJSONString(verify));
+
+        return verify;
     }
 
     @Transaction
@@ -126,7 +147,7 @@ public class VerifyContract implements ContractInterface {
             for (KeyValue kv: queryResult) {
                 VerifyQueryResult Result = new VerifyQueryResult();
                 Result.setKey(kv.getKey());
-                Result.setVerify(JSON.parseObject(kv.getStringValue() , VerifySever.class));
+                Result.setVerify(JSON.parseObject(kv.getStringValue() , VerifyServer.class));
                 results.add(Result);
             }
             resultList.setList(results);
