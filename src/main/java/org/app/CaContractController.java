@@ -215,6 +215,9 @@ public class CaContractController {
     @ResponseBody
     public Map<String, Object> verifyProperties(@RequestBody String key, @RequestBody String id) throws GatewayException, IOException {
         Map<String, Object> result = Maps.newConcurrentMap();
+        //此字符数组应为参数传入属性名集合，这里提前定义作为测试使用
+        String properties[] = new String[]{"name", "age", "grade"};//attrs
+        
         ServerSocket serverSocket = new ServerSocket(8888);
         // 创建客户端socket
         Socket socket = new Socket();
@@ -229,12 +232,22 @@ public class CaContractController {
         System.out.print("Fetch on-chain attributes\n");
         //TODO 获取链上属性并保存为文件 enc_credential_v.json 存放到文件夹
         byte[] ca = contract.evaluateTransaction("queryCa", id);
-        byteToFile(ca, "enc_credential_v.json");
-//            for (String property:properties) {
-//                byte[] readFileToByteArray = FileUtils.readFileToByteArray(new File("./server_folder/" + property));
-//                String codes = readFileToByteArray.toString();
-//                decodeFile(codes, "./verifier_folder/" + property);
-//            }
+        String[] str = StringUtils.newStringUtf8(ca).split("\"");
+
+        Map<String, String> map = new HashMap<String, String>();
+        for (int i = 3; i < str.length; i+=4) {
+            map.put(str[i-2], str[i]);
+        }
+        OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("enc_credential_v.json"),"UTF-8");
+        JSONObject obj = new JSONObject();
+        for (String s: properties) {
+            System.out.println("key="+s+","+"value="+map.get(s));//输出方便查看
+            obj.put(s, map.get(s));
+        }
+        osw.write(obj.toString());
+        osw.flush();
+        osw.close();
+
         try {
             //发送消息给verifier说明enc_credential_v.json已经准备就绪
             os = socket.getOutputStream();
@@ -314,11 +327,5 @@ public class CaContractController {
         decodeFile(codes, new File(filePath));
     }
     
-    public static void byteToFile(byte[] bytes, String fileName) throws IOException {
-        File file = new File(fileName);
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-        bos.write(bytes);
-        bos.close();
-    }
 
 }
