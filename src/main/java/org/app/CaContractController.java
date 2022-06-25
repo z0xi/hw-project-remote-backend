@@ -275,12 +275,8 @@ public class CaContractController {
             try {
                 if(br!=null)
                     br.close();
-                if(isr!=null)
-                    isr.close();
                 if(pw!=null)
                     pw.close();
-                if(is!=null)
-                    is.close();
                 if(socket!=null){
                     socket.close();
                     serverSocket.close();
