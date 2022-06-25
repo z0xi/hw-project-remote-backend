@@ -142,6 +142,7 @@ public class CaContractController {
     }
 
     @GetMapping("/upload")
+    @ResponseBody
     public Map<String, Object> uploadByName() throws IOException {
        Map<String, Object> result = Maps.newConcurrentMap();
         // 创建服务端socket
@@ -161,6 +162,7 @@ public class CaContractController {
             System.out.println(mess);
             if(mess.equals("success")){
                 socket.shutdownInput();
+                System.out.println("Uploading");
                 //TODO 这里必须弄成任意字段，别写死
                 String age = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/age");
                 String name = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/name");
