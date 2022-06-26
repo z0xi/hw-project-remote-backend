@@ -185,7 +185,6 @@ public class CaContractController {
                 e.printStackTrace();
             }
             if(mess.equals("success")){
-                socket.shutdownInput();
                 System.out.println("Uploading");
                 //TODO 这里必须弄成任意字段，别写死
                 String age = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/age");
