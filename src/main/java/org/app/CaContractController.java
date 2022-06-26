@@ -207,7 +207,7 @@ public class CaContractController {
 
     @PostMapping("/verify")
     @ResponseBody
-    public Map<String, Object> verifyProperties(@RequestParam("key") String key, @RequestParam("certid") String id, @RequestParam("paramset") String[] properties) throws GatewayException, IOException {
+    public Map<String, Object> verifyProperties(@RequestParam("key") String key, @RequestParam("certid") String id, @RequestParam("state") String state, @RequestParam("paramset") String[] properties) throws GatewayException, IOException {
         Map<String, Object> result = Maps.newConcurrentMap();
         //此字符数组应为参数传入属性名集合，这里提前定义作为测试使用
 //        String properties[] = new String[]{"name", "age", "grade"};//attrs
@@ -255,7 +255,7 @@ public class CaContractController {
                 System.out.print("Success\n");
                 Network network = gateway.getNetwork("mychannel");
                 Contract verifyContract = network.getContract("verify");
-                bytes = verifyContract.submitTransaction("updateVerify", key,  id, "sever1", "help", "authorized", "{name=123}");
+                bytes = verifyContract.submitTransaction("updateVerify", key, state);
             }
             result.put("payload", StringUtils.newStringUtf8(bytes));
             result.put("status", "ok");
