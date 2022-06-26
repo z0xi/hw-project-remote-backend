@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hf</groupId>
-    <artifactId>ca</artifactId>
+    <artifactId>verify</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -20,18 +20,14 @@
 
 
     <repositories>
-
         <repository>
-            <id>aliyun</id>
-            <url>https://maven.aliyun.com/repository/public</url>
+            <id>public</id>
+            <name>aliyun nexus</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
         </repository>
-
         <repository>
             <id>jitpack.io</id>
             <url>https://www.jitpack.io</url>
@@ -41,9 +37,21 @@
             <id>artifactory</id>
             <url>https://hyperledger.jfrog.io/hyperledger/fabric-maven</url>
         </repository>
-
-
     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>public</id>
+            <name>aliyun nexus</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
     <dependencies>
 
