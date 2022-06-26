@@ -232,6 +232,9 @@ public class CaContractController {
         }
         OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("/home/kali/Desktop/hw-project/verifier/verifier_folder/enc_credential_v.json"),"UTF-8");
         JSONObject obj = new JSONObject();
+        for (String s: properties) {
+            obj.put(s, map.get(s));
+        }
         osw.write(obj.toString());
         osw.flush();
         osw.close();
