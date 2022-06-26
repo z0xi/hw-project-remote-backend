@@ -91,9 +91,9 @@ public class CaContractController {
 
         Map<String, Object> result = Maps.newConcurrentMap();
 
-//        byte[] ca = contract.submitTransaction("deleteCa" , key);
+        byte[] ca = contract.submitTransaction("deleteCa" , key);
 
-//        result.put("payload", StringUtils.newStringUtf8(ca));
+        result.put("payload", StringUtils.newStringUtf8(ca));
         result.put("status", "ok");
 
         return result;
@@ -163,6 +163,23 @@ public class CaContractController {
             System.out.println(mess);
             if(mess.equals("success")){
                 socket.shutdownInput();
+                if(mess.equals("success")){
+                    System.out.println("Uploading");
+                    //TODO 这里必须弄成任意字段，别写死
+                    String age = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/age");
+                    String name = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/name");
+                    String grade = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/grade");
+                    String subject = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/subject");
+                    String university = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/university");
+                    String issuer = "CA";
+                    byte[] bytes = contract.submitTransaction("createCa", name, age, grade, subject, university, issuer);
+                    result.put("payload", StringUtils.newStringUtf8(bytes));
+                    System.out.print("Upload finish\n");
+                }
+                else{
+                    System.out.print("Upload fail\n");
+                }
+                result.put("status", "ok");
             }
             else{
                 System.out.print("Upload fail\n");
@@ -184,23 +201,6 @@ public class CaContractController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if(mess.equals("success")){
-                System.out.println("Uploading");
-                //TODO 这里必须弄成任意字段，别写死
-                String age = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/age");
-                String name = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/name");
-                String grade = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/grade");
-                String subject = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/subject");
-                String university = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/university");
-                String issuer = "CA";
-                byte[] bytes = contract.submitTransaction("createCa", name, age, grade, subject, university, issuer);
-                result.put("payload", StringUtils.newStringUtf8(bytes));
-                System.out.print("Upload finish\n");
-            }
-            else{
-                System.out.print("Upload fail\n");
-            }
-            result.put("status", "ok");
         }
         return result;
     }
@@ -221,7 +221,8 @@ public class CaContractController {
         BufferedReader br=null;
         PrintWriter pw = null;
         System.out.print("Fetch on-chain attributes\n");
-        //TODO 获取链上属性并保存为文件 enc_credential_v.json 存放到文件夹
+
+        //获取链上对应certid的属性并保存
         byte[] ca = contract.evaluateTransaction("queryCa", id);
         String[] str = StringUtils.newStringUtf8(ca).split("\"");
 
@@ -231,10 +232,6 @@ public class CaContractController {
         }
         OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("/home/kali/Desktop/hw-project/verifier/verifier_folder/enc_credential_v.json"),"UTF-8");
         JSONObject obj = new JSONObject();
-        for (String s: properties) {
-            System.out.println("key="+s+","+"value="+map.get(s));//输出方便查看
-            obj.put(s, map.get(s));
-        }
         osw.write(obj.toString());
         osw.flush();
         osw.close();
@@ -253,7 +250,6 @@ public class CaContractController {
             byte[] bytes = null;
             if(mess.equals("success")){
                 System.out.print("Success\n");
-                //TODO chaincode上链
                 Network network = gateway.getNetwork("mychannel");
                 Contract verifyContract = network.getContract("verify");
                 bytes = verifyContract.submitTransaction("updateVerify", key,  id, "sever1", "help", "authorized", "{name=123}");
