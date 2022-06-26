@@ -143,7 +143,7 @@ public class CaContractController {
 
     @GetMapping("/upload")
     @ResponseBody
-    public Map<String, Object> uploadByName() throws IOException {
+    public Map<String, Object> uploadByName() throws IOException, EndorseException, CommitException, SubmitException, CommitStatusException {
        Map<String, Object> result = Maps.newConcurrentMap();
         // 创建服务端socket
         ServerSocket serverSocket = new ServerSocket(8899);
@@ -154,12 +154,36 @@ public class CaContractController {
         // 监听客户端
         socket = serverSocket.accept();
         BufferedReader br=null;
+        String mess = null;
         try {
             //读取服务器返回的消息
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            String mess = br.readLine();
+            mess = br.readLine();
             System.out.println(mess);
+            if(mess.equals("success")){
+                socket.shutdownInput();
+            }
+            else{
+                System.out.print("Upload fail\n");
+            }
+            result.put("status", "ok");
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally{
+            //关闭资源
+            try {
+                if(br!=null)
+                    br.close();
+                if(socket!=null){
+                    socket.close();
+                    serverSocket.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             if(mess.equals("success")){
                 socket.shutdownInput();
                 System.out.println("Uploading");
@@ -178,30 +202,6 @@ public class CaContractController {
                 System.out.print("Upload fail\n");
             }
             result.put("status", "ok");
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (EndorseException e) {
-            throw new RuntimeException(e);
-        } catch (SubmitException e) {
-            throw new RuntimeException(e);
-        } catch (CommitException e) {
-            throw new RuntimeException(e);
-        } catch (CommitStatusException e) {
-            throw new RuntimeException(e);
-        } finally{
-            //关闭资源
-            try {
-                if(br!=null)
-                    br.close();
-                if(socket!=null){
-                    socket.close();
-                    serverSocket.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         return result;
     }
