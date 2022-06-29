@@ -150,11 +150,13 @@ public class CaContractController {
 
         // 创建客户端socket
         Socket socket = new Socket();
-        System.out.print("Oracle connected\n");
         // 监听客户端
         socket = serverSocket.accept();
+        System.out.print("Oracle connected\n");
         BufferedReader br=null;
         String mess = null;
+        System.out.println("---Verifying\n");
+
         try {
             //读取服务器返回的消息
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -164,7 +166,7 @@ public class CaContractController {
             if(mess.equals("success")){
                 socket.shutdownInput();
                 if(mess.equals("success")){
-                    System.out.println("Uploading");
+                    System.out.println("---Uploading\n");
                     //TODO 这里必须弄成任意字段，别写死
                     String age = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/age");
                     String name = encodeFile("/home/kali/Desktop/hw-project/oracle/server_folder/name");
@@ -174,7 +176,7 @@ public class CaContractController {
                     String issuer = "CA";
                     byte[] bytes = contract.submitTransaction("createCa", name, age, grade, subject, university, issuer);
                     result.put("payload", StringUtils.newStringUtf8(bytes));
-                    System.out.print("Upload finish\n");
+                    System.out.print("---Upload finish\n");
                 }
                 else{
                     System.out.print("Upload fail\n");
@@ -182,7 +184,7 @@ public class CaContractController {
                 result.put("status", "ok");
             }
             else{
-                System.out.print("Upload fail\n");
+                System.out.print("---Upload fail\n");
             }
             result.put("status", "ok");
         } catch (UnknownHostException e) {
@@ -211,7 +213,6 @@ public class CaContractController {
         Map<String, Object> result = Maps.newConcurrentMap();
         //此字符数组应为参数传入属性名集合，这里提前定义作为测试使用
 //        String properties[] = new String[]{"name", "age", "grade"};//attrs
-        System.out.print("12345");
         ServerSocket serverSocket = new ServerSocket(8888);
         // 创建客户端socket
         Socket socket = new Socket();
@@ -220,7 +221,7 @@ public class CaContractController {
         System.out.print("User connected\n");
         BufferedReader br=null;
         PrintWriter pw = null;
-        System.out.print("Fetch on-chain attributes\n");
+        System.out.print("---Fetch on-chain attributes\n");
 
         //获取链上对应certid的属性并保存
         byte[] ca = contract.evaluateTransaction("queryCa", id);
@@ -244,15 +245,15 @@ public class CaContractController {
             pw = new PrintWriter(socket.getOutputStream());
             pw.write("FileReady");
             pw.flush();
-            System.out.print("Verifying…\n");
+            System.out.print("---Verifying\n");
            
             //读取服务器返回的消息
             br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String mess = br.readLine();
-            System.out.println(mess);
+//            System.out.println(mess);
             byte[] bytes = null;
             if(mess.equals("success")){
-                System.out.print("Success\n");
+                System.out.print("---Verifying success\n");
                 Network network = gateway.getNetwork("mychannel");
                 Contract verifyContract = network.getContract("verify");
                 bytes = verifyContract.submitTransaction("updateVerify", key, "1");
