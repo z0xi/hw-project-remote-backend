@@ -268,6 +268,9 @@ public class CaContractController {
             String errorMessage = String.format("Verify: %s already exists", id);
             System.out.println(errorMessage);
             throw new RuntimeException(errorMessage);
+        }catch (NullPointerException e) {
+            System.out.print("---Verify fail\n");
+            e.printStackTrace();
         }catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
