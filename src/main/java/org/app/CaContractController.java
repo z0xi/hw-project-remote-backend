@@ -257,8 +257,12 @@ public class CaContractController {
                 Network network = gateway.getNetwork("mychannel");
                 Contract verifyContract = network.getContract("verify");
                 bytes = verifyContract.submitTransaction("updateVerify", key, "1");
+                result.put("payload", StringUtils.newStringUtf8(bytes));
             }
-            result.put("payload", StringUtils.newStringUtf8(bytes));
+            else{
+                System.out.print("---Verify fail\n");
+                result.put("payload", "fail");
+            }
             result.put("status", "ok");
         } catch (GatewayException e) {
             String errorMessage = String.format("Ca: %s does not exist", id);
@@ -268,9 +272,6 @@ public class CaContractController {
             String errorMessage = String.format("Verify: %s already exists", id);
             System.out.println(errorMessage);
             throw new RuntimeException(errorMessage);
-        }catch (NullPointerException e) {
-            System.out.print("---Verify fail\n");
-            e.printStackTrace();
         }catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
